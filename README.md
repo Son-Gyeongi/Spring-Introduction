@@ -73,7 +73,7 @@ Gradle은 의존관계가 있는 라이브러리를 다운로드합니다.
 **thymeleaf 템플릿 엔진으로 동작해보기**
  - 웹 애플리케이션에서 첫 번째 진입점이 Controller이다. Controller 클래스 만들면 @Controller를 만들어줘야 한다.   
 참고 : [templates/hello.html](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/resources/templates/hello.html)   
-참고 : [helloController에서 "hello" 매핑](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/java/hello/hellospring/controller/HelloController.java)
+참고 : [HelloController에서 "hello" 찾아서 매핑](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/java/hello/hellospring/controller/HelloController.java)
  - thymeleaf 템플릿 엔진 동작 환경 그림   
  1. 웹 브라우저에서 localhost:8080/hello 입력
  2. 내장 톰캣 서버에서 hello와 매핑되는 Controller를 찾습니다. helloController에서 hello 메서드 찾음
@@ -104,12 +104,6 @@ intelliJ 컴파일 방법 : 상단바메뉴 build -> Recompile
 5. 스프링이 실행 됩니다.
 ![이미지8](https://user-images.githubusercontent.com/78200199/228803764-28367de8-be08-4bcd-8483-e361b053e285.jpg)
 
-> 맥 사용자
-1. ./gradlew build
-2. cd build/libs
-3. java -jar hello-spring-0.0.1-SNAPSHOT.jar
-4. 실행 
-
 > 스프링 실행을 멈추고 싶다면 ctrl + c 를 눌러줍니다.   
 
 > 서버 배포할 때 이 파일만 복사해서 서버에 넣어주고 java -jar 파일명으로 실행해주면 됩니다. 그러면 서버에서 스프링이 동작합니다.   
@@ -128,8 +122,39 @@ dir : 폴더에 존재하는 파일, 폴더 모두 출력
 cd 해당폴더 : 해당폴더로 이동
 
 ## 스프링 웹 개발 기초
+* 정적 컨텐츠
+   - 파일을 그대로 클라이언트에게 전달합니다.
+* MVC와 템플릿 엔진
+   - Model, View(템플릿 엔진 화면), Controller 이 3가지를 MVC라고 합니다.
+   - [JSP, PHP가 템플릿 엔진이다. html을 그냥 주는 게 아닌 서버에서 프로그래밍을 해서 html을 동적으로 바꿔서 내려줍니다.]
+* API
+   - html을 내려주는 게 아닌 **JSON 데이터 구조 포맷**을 내려줍니다.
+   - JSON 형태로 클라이언트에게 데이터 전달합니다.
+   - 사용 : 프론트엔드(Vue.js, React)와 통신할 때, 서버끼리 통신할 때(데이터 주고 받을 때) 
 ### - 정적 컨텐츠
+**스프링부트는 정적 컨텐츠 기능 자동으로 제공합니다.**   
+참고 : [스프링부트 공식문서](https://docs.spring.io/spring-boot/docs/2.3.1.RELEASE/reference/html/spring-boot-features.html#boot-features-spring-mvc-static-content)   
+참고 : [static/hello-static.html](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/resources/static/hello-static.html)   
+-> 실행 후 확인 : http://localhost:8080/hello-static.html 로 확인합니다. 화면에 '정적 컨텐츠 입니다.'가 나오면 성공!!   
+ - thymeleaf 템플릿 엔진 동작 환경 그림   
+ 1. 웹 브라우저에 localhost:8080/hello-static.html을 입력합니다.
+ 2. 내장 톰캣 서버가 요청을 받습니다.
+ 3. [그림에서 1] hello-static.html이 왔다고 spring에 넘겨줍니다.   
+ spring은 먼저 controller에 hello-static이 있는지 찾습니다.   
+ **controller가 먼저 우선순위를 가집니다.**   
+ 4. [그림에서 2] controller에 없다면 그 다음에 스프링부트가 내부에 있는 resources 안에 있는 static 폴더에 hello-static.html을 찾습니다. 있으면 반환해줍니다.   
+ ![이미지9](https://user-images.githubusercontent.com/78200199/229110065-932a05b0-612e-42ad-9274-afad07675345.jpg)
+그림 출처 : 인프런 깅영한님 강의 [스프링 입문 - 코드로 배우는 스프링 부트, 웹 MVC, DB 접근 기술]
+
 ### - MVC와 템플릿 엔진
+* MVC : Model, View, Controller
+* 역할과 책임을 분리
+   - View는 화면을 그리는데 모든 역량을 집중해야 합니다.
+   - Controller나 Model과 관련된 부분은 비즈니스 로직과 관련있거나 뭔가 내부적인 처리하는데 집중해야 합니다.
+* Controller는 서버 뒷단에 관련된 거 처리, Model에 관련된 화면에 필요한 걸 담아서 화면에 넘겨주는 패턴을 많이 사용합니다.   
+참고 : [HelloController에서 "hello-mvc" 매핑](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/java/hello/hellospring/controller/HelloController.java)   
+참고 : [templates/hello-template.html](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/resources/templates/hello-template.html)   
+-> 실행 후 확인 : http://localhost:8080/hello-mvc?name=spring 로 확인합니다. 화면에 'hello spring'이 나오면 성공!!  
 ### - API
 ### 회원 관리 예제 - 백엔드 개발
 ### - 비즈니스 요구사항 정리
