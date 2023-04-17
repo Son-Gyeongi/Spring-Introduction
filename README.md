@@ -136,7 +136,7 @@ cd 해당폴더 : 해당폴더로 이동
 참고 : [스프링부트 공식문서](https://docs.spring.io/spring-boot/docs/2.3.1.RELEASE/reference/html/spring-boot-features.html#boot-features-spring-mvc-static-content)   
 참고 : [static/hello-static.html](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/resources/static/hello-static.html)   
 -> 실행 후 확인 : http://localhost:8080/hello-static.html 로 확인합니다. 화면에 '정적 컨텐츠 입니다.'가 나오면 성공!!   
- - thymeleaf 템플릿 엔진 동작 환경 그림   
+ - 정적 컨텐츠 동작 환경 그림   
  1. 웹 브라우저에 localhost:8080/hello-static.html을 입력합니다.
  2. 내장 톰캣 서버가 요청을 받습니다.
  3. [그림에서 1] hello-static.html이 왔다고 spring에 넘겨줍니다.   
@@ -153,9 +153,74 @@ cd 해당폴더 : 해당폴더로 이동
    - Controller나 Model과 관련된 부분은 비즈니스 로직과 관련있거나 뭔가 내부적인 처리하는데 집중해야 합니다.
 * Controller는 서버 뒷단에 관련된 거 처리, Model에 관련된 화면에 필요한 걸 담아서 화면에 넘겨주는 패턴을 많이 사용합니다.   
 참고 : [HelloController에서 "hello-mvc" 매핑](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/java/hello/hellospring/controller/HelloController.java)   
+   - @RequestParam() : ()괄호 안 옵션 required클라이언트로부터 받는 값이다. 기본적으로 true여서 꼭 받아야하는 값입니다. false로 해주면 꼭 값을 안 받아도 됩니다.
+   - HTTP메서드 GET방식에서 url?키=값&&키=값 으로 파라미터 넘길 수 있습니다.
 참고 : [templates/hello-template.html](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/resources/templates/hello-template.html)   
 -> 실행 후 확인 : http://localhost:8080/hello-mvc?name=spring 로 확인합니다. 화면에 'hello spring'이 나오면 성공!!  
+   - 타임리프 장점 - html을 그대로 쓰고 그 파일을 서버없이 열어도 껍데기를 볼 수 있습니다.
+   
+ - MVC, 템플릿 엔진 동작 환경 그림   
+ 1. 웹 브라우저에 localhost:8080/hello-mvc?name=spring!을 입력합니다.
+ 2. 내장 톰캣 서버가 요청을 받습니다.
+ 3. hello-mvc가 왔다고 spring에 넘겨줍니다.   
+ HelloController에 hello-mvc가 메서드와 매핑이 되어있는 걸 발견하고 그 메서드를 호출합니다. 
+ **controller가 먼저 우선순위를 가집니다.**   
+ 4. return은 hello-template으로 하고 model에는 키는 name이고 값은 spring으로 spring에 넘깁니다.   
+ 그러면 스프링이 화면과 관련되 해결자(viewResolver)가 동작합니다.
+ 5. viewResolver가 templates에 hello-template이랑 똑같은 파일을 찾아서 thymeleaf템플릿 엔진에게 처리해달라고 넘깁니다.   
+ 그러면 템플릿 엔진이 렌더링해서 변환을 한 HTML을 웹 브라우저에 반환합니다.   
+ [정적일 때는 변환 없이 그대로 반환해 주었다. 템플릿 엔진은 변환해서 웹 브라우저에 넘겨준다.]
+![mvc템플릿이미지](https://user-images.githubusercontent.com/78200199/232477391-b5b9ed5d-bebb-4b63-b60e-5c83240e485a.jpg)
+그림 출처 : 인프런 깅영한님 강의 [스프링 입문 - 코드로 배우는 스프링 부트, 웹 MVC, DB 접근 기술]
+
 ### - API
+* API는 데이터만 내려줍니다. / MVC와 템플릿 엔진은 HTML을 내려줍니다.     
+   - @ResponseBody 문자 반환   
+      + 참고 : [@GetMapping("hello-string")](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/java/hello/hellospring/controller/HelloController.java/) 
+      + HTTP 통신 프로토콜에서 Head부와 Body부가 있습니다. Body부에서 데이터를 내가 직접 넣어주겠다라는 뜻입니다.   
+   응답Body부에 "hello"+name을 직접 넣어주겠다라는 의미입니다.(HTTP의 Body에 문자 내용을 직접 반환)
+      + @ResponseBody를 사용하면 viewResolver를 사용하지 않습니다.
+      + -> 실행 후 확인 : http://localhost:8080/hello-string?name=spring 로 확인합니다. 화면에 'hello spring'이 나오면 성공!!
+      
+   - @ResponseBody 객체 반환
+      + 참고 : [@GetMapping("hello-api")](https://github.com/Son-Gyeongi/Spring_RoadMap_Lecture/blob/master/src/main/java/hello/hellospring/controller/HelloController.java/) 
+      + @ResponseBody를 사용하고, 객체를 반환하면 객체가 JSON으로 변환됩니다.
+      + JSON형식은 key-value구조로 되어있습니다.
+      + xml방식은 무겁고 열고닫는 태그를 두번 써야합니다.(<HTML></HTML>)   
+      요즘에는 JSON방식으로 통일하고 있는 추세입니다.
+      + -> 실행 후 확인 : http://localhost:8080/hello-api?name=spring 로 확인합니다. 화면에 'spring'이 나오면 성공!!
+      
+ - @ResponseBody 사용 원리  
+ 1. 웹 브라우저에 localhost:8080/hello-api를 입력합니다.
+ 2. 톰캣 내장 서버에서 hello-api가 왔어하고 spring에 던집니다.
+ 3. 스프링은 helloController 안에 hello-api가 있네 그리고 @ResponseBody 애노테니션이 붙어있네 확인을 합니다.
+ 4. @ResponseBody가 있으면 HTTP(Body)응답에 데이터를 그대로 넘겨야겠구나 하며 동작합니다.   
+ 그런데 반환하는 게 문자가 아닌 객체면 spring에서 한 번 더 생각합니다.[문자면 그냥 HTTP응답에 바로 넣어서 줬다. 그러면 끝]   
+ 객체가 오면 기본으로 그냥 JSON방식 데이터로 만들어서 HTTP 응답에 반환합니다.
+    - @ResponseBody가 있고 hello 객체를 넘기면 이 객체를 보고 HttpMessageConverter가 동작합니다.   
+    [기존에는 viewResolver가 동작했다],   
+    [클라이언트의 HTTP Accept헤더와 서버의 컨트롤러 반환 타입 정보 둘을 조합해서 HttpMessageConverter가 선택된다] 
+    - 단순 문자면 StringConverter가 동작
+    - 객체면 JsonConverter가 동작 -> 그러면 hello 객체를 JSON스타일로 바꿉니다.
+       + 객체를 JSON으로 변환하는 라이브러리
+          1. Jackson2 라이브러리(스프링에 기본적으로 탑재되어 있음)
+          2. gson
+    - name은 값으로 요청한 웹 브라우저/서버에게 응답해 줍니다.
+![Response 사용원리](https://user-images.githubusercontent.com/78200199/232477490-2eee752d-7dbe-4f61-a961-d53429fccb3b.jpg)
+그림 출처 : 인프런 깅영한님 강의 [스프링 입문 - 코드로 배우는 스프링 부트, 웹 MVC, DB 접근 기술]
+
+---
+**한번 더 정리**
+* 정적 컨텐츠
+   - 그냥 파일을 그대로 내려줍니다.
+* MVC와 템플릿 엔진
+   - 템플릿 엔진을 Model, View, Controller방식으로 쪼개서 View를 템플릿 엔진으로 HTML을 프로그래밍한 것을 렌더링해서 렌더링이 된 HTML을 고객에게 전달해줍니다.
+* API
+   - 일반적으로 객체를 반환합니다.
+   - HttpMessageConverter를 통해서 JSON스타일로 바꿔서 반환합니다.
+   - view 없이 바로 HTTP Response에 값을 넣어서 반환합니다.
+---
+
 ### 회원 관리 예제 - 백엔드 개발
 ### - 비즈니스 요구사항 정리
 ### - 회원 도메인과 리포지토리 만들기
